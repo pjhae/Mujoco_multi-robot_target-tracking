@@ -40,6 +40,8 @@ class HexyEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         # angle diff
         self.angle_diff = 0
 
+        self.rel_desired_heading_vec = np.array([0,0])
+
         mujoco_env.MujocoEnv.__init__(self, xml_file, 5)
 
 
@@ -48,7 +50,7 @@ class HexyEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         # if height of hexy is too low or distance between two agent is too far, reset!!
 
         # Initialize Healthy condition
-        is_healthy = (self.state_vector()[2]) > -0.05 and self.dist_between_agents < 0.70 and self.xy_1_vel < 0.5 and abs(self.angle_diff) < 1.8 #1.8?
+        is_healthy = (self.state_vector()[2]) > -0.05 and self.dist_between_agents < 0.65 and self.xy_1_vel < 0.5  and abs(self.angle_diff) < 2  #1.8?
 
 
         traget_body_array   = ["T_BRf1", "T_BRf2", "T_BRf3", "T_BRf4", "T_BLf1", "T_BLf2", "T_BLf3", "T_BLf4", "T_BLt1", "T_BLt2", "T_BLs1", "Torso_2"]
@@ -224,15 +226,20 @@ class HexyEnv(mujoco_env.MujocoEnv, utils.EzPickle):
 
 
         #### Rewards (사이의 거리, 속도, 충돌)
-        # Distance reward
-
+        ## Distance reward
+        # Desired heading vector
         desired_heading_vec = np.array([x_2_pos - x_1_pos , y_2_pos -  y_1_pos])
         desired_heading_unit_vec= desired_heading_vec / np.linalg.norm(desired_heading_vec)
 
+        # Follower's rotation matrix
         rot_ang = self.state_vector()[5]
         rot_matrix = np.array([[np.cos(rot_ang), np.sin(rot_ang)] , [-np.sin(rot_ang), np.cos(rot_ang)]])
-        rel_desired_heading_vec = rot_matrix @ desired_heading_vec
 
+        # Desired heading vector w.r.t Follower's frame
+        rel_desired_heading_vec = rot_matrix @ desired_heading_vec
+        self.rel_desired_heading_vec = rel_desired_heading_vec
+
+        # Angle difference ver 1
         ref_unit_vec = np.array([1, 0])
         cos_theta = np.dot(desired_heading_unit_vec, ref_unit_vec)
         if desired_heading_vec[1]<0:
@@ -253,13 +260,29 @@ class HexyEnv(mujoco_env.MujocoEnv, utils.EzPickle):
 
         self.angle_diff = abs(angle_diff)
 
+        # Angle difference ver 2
+        target_ang = self.state_vector()[29]
+        follower_ang = self.state_vector()[5]
+
+        if follower_ang > 0:
+            if target_ang > 0:
+                angle_diff_2 = abs(follower_ang - target_ang)
+            else:
+                angle_diff_2 = follower_ang + abs(target_ang)
+        else:
+            if target_ang > 0:
+                angle_diff_2 = abs(follower_ang) + target_ang
+            else:
+                angle_diff_2 = abs(follower_ang - target_ang)
+
+
         A = 10
-        B = 0.2 # 0.2   / 0.5 나기 0.2
+        B = 0.1 # 0.2   / 0.5 나기 0.2
         C = 10
 
-        dist_reward = A - ((((rel_desired_heading_vec[0]-0.40)**2 + (rel_desired_heading_vec[1]) **2)**(0.5)) / B   +  C * self.angle_diff )
-        print(Distance_between_two_agents)
-        print(self.angle_diff* 180/np.pi)
+        dist_reward = A - ((((rel_desired_heading_vec[0]-0.35)**2 + (rel_desired_heading_vec[1]) **2)**(0.5)) / B   +  C * angle_diff_2)
+
+        # print(angle_diff_2 * 180 / np.pi)
 
         # Collision reward
         col_reward = 0
@@ -330,16 +353,7 @@ class HexyEnv(mujoco_env.MujocoEnv, utils.EzPickle):
 
     def _get_obs(self):
 
-        x_1_pos = self.state_vector()[0]
-        y_1_pos = self.state_vector()[1]
-        x_2_pos = self.state_vector()[24]+0.45
-        y_2_pos = self.state_vector()[25]
-
-        desired_heading_vec = np.array([x_2_pos - x_1_pos , y_2_pos -  y_1_pos])
-        desired_heading_unit_vec= desired_heading_vec / np.linalg.norm(desired_heading_vec)
-
-        #return np.concatenate([self.state_vector()[6:24], desired_heading_unit_vec, [np.linalg.norm(desired_heading_vec)]])
-        return np.concatenate([self.state_vector()[6:24], desired_heading_vec])
+        return np.concatenate([self.state_vector()[6:24], self.rel_desired_heading_vec ])
 
     def reset_model(self):
 
