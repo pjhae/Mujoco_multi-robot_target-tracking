@@ -99,7 +99,7 @@ you can see the code for specific MDP setting(S,A,R..) info
 
 ### 8. VIDEO
 
-**Video : [YOUTUBE link](https://youtu.be/kn1GcEtVa3g)**
+**Video : [YOUTUBE link](https://youtu.be/n8gWz1U0qKk)**
 
 You can watch **video** through the link above!
 
