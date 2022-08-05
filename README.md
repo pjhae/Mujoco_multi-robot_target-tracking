@@ -72,6 +72,8 @@ you can see the code for specific MDP setting(S,A,R..) info
 
     YOUR_PATH/python3.X/site-packages/gym/envs/mujoco/
 
+![image](https://user-images.githubusercontent.com/74540268/183005146-f607a6bd-2653-4a20-bad5-2e9ca2ad9132.png)
+
 
 **hexy_v8.py** : *TASK*
 
@@ -87,7 +89,7 @@ you can see the code for specific MDP setting(S,A,R..) info
 
 
 ##
-### 6. Results - Camera obs + CNN verification
+### 7. Results - Camera obs + CNN verification
   
 
 ![image](https://user-images.githubusercontent.com/74540268/183004664-03896098-c707-4258-b5c3-d086483bebf1.png)
@@ -95,6 +97,7 @@ you can see the code for specific MDP setting(S,A,R..) info
 
 ##
 
+### 8. VIDEO
 
 **Video : [YOUTUBE link](https://youtu.be/kn1GcEtVa3g)**
 
