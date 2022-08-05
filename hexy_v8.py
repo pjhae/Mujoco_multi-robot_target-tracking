@@ -87,11 +87,10 @@ class HexyEnv(mujoco_env.MujocoEnv, utils.EzPickle):
 
     @property
     def is_healthy(self):
-        # if height of hexy is too low or distance between two agent is too far, reset!!
-
         # Initialize Healthy condition
         is_healthy = (self.state_vector()[2]) > -0.05 and self.dist_between_agents < 0.65 and self.xy_1_vel < 0.5  and abs(self.angle_diff) < 2  #1.8?
 
+        # Collision condition
         for i in range(self.sim.data.ncon):
              sim_contact = self.sim.data.contact[i]
              for j in range(len(self.target_body_array)):
@@ -117,9 +116,10 @@ class HexyEnv(mujoco_env.MujocoEnv, utils.EzPickle):
 
 
     def step(self, action):
-        # print(action.shape)
+
         action = action[0:18]
 
+        ### Action Sequence
         # Turn Right
         Act1 = np.array([0.0, -0.75, 0.4,
                          -0.3, -0.75, 0.4,
@@ -211,15 +211,28 @@ class HexyEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         Action_dct["Turn_Right"] = Turn_Right
         Action_dct["Turn_Left"] = Turn_Left
 
+
+        ## Training trajectory
         Action_sequence = ["Go_straight"] *10 + ["Turn_Left"]*10 +["Go_straight"] *10  +["Turn_Right"] * 20 +["Go_straight"] *10 + ["Turn_Left"]*20 +["Go_straight"] *10+ ["Turn_Right"] * 20 +["Go_straight"] *10 + ["Turn_Left"]*20 +["Go_straight"] *20
-        #Action_sequence = ["Go_straight"] * 160
-        #Action_sequence = ["Go_straight"] * 10 + ["Turn_Left"] * 20 + ["Go_straight"] * 10 + ["Turn_Right"] * 20 + ["Go_straight"] * 10 + ["Turn_Left"] * 10 + ["Go_straight"] * 20 + ["Turn_Right"] * 10 + ["Go_straight"] * 10 + ["Turn_Left"] * 30 + ["Go_straight"] * 10
+
+        ## Test trajectory_straight
+        # Action_sequence = ["Go_straight"] * 160
+
+        ## Test trajectory_random
+        # Action_sequence = ["Go_straight"] * 10 + ["Turn_Left"] * 20 + ["Go_straight"] * 10 + ["Turn_Right"] * 20 + ["Go_straight"] * 10 + ["Turn_Left"] * 10 + ["Go_straight"] * 20 + ["Turn_Right"] * 10 + ["Go_straight"] * 10 + ["Turn_Left"] * 30 + ["Go_straight"] * 10
+
+        ## Test trajectory_random2
+        # Action_sequence = ["Go_straight"] * 20 + ["Turn_Left"] * 30 + ["Go_straight"] * 10 + ["Turn_Right"] * 30 + ["Go_straight"] * 10 + ["Turn_Left"] * 30 + ["Go_straight"] * 30
+
+        ## Test trajectory_random3
+        #Action_sequence = ["Go_straight"] * 10 + ["Turn_Right"] * 20 + ["Go_straight"] * 10 + ["Turn_Left"] * 20 + ["Go_straight"] * 10 + ["Turn_Right"] * 10 + ["Go_straight"] * 20 + ["Turn_Left"] * 10 + ["Go_straight"] * 10 + ["Turn_Right"] * 30 + ["Go_straight"] * 10
 
         ## How to calculate time-step ?  =>  (160) * 4 * Interval(2) = 1280
 
+        ## MOTION Generator
         motion = Action_dct[Action_sequence [  (self.time_step // (4*self.interval)) ]  ]  [(self.time_step%(4*self.interval))//(self.interval)]
-        # motion = [0]*18
 
+        ## SET state without doing simulate
         # self.set_state(np.hstack((self.sim.get_state().qpos[0:30] ,motion))  , np.hstack((self.sim.get_state().qvel[0:30],[0.4]*18)))
 
 
@@ -265,7 +278,7 @@ class HexyEnv(mujoco_env.MujocoEnv, utils.EzPickle):
 
 
         #### Rewards (사이의 거리, 속도, 충돌)
-        ## Distance reward
+
         # Desired heading vector
         desired_heading_vec = np.array([x_2_pos - x_1_pos , y_2_pos -  y_1_pos])
         desired_heading_unit_vec= desired_heading_vec / np.linalg.norm(desired_heading_vec)
@@ -314,14 +327,13 @@ class HexyEnv(mujoco_env.MujocoEnv, utils.EzPickle):
             else:
                 angle_diff_2 = abs(follower_ang - target_ang)
 
-
+        ## Distance reward
+        
         A = 10
         B = 0.2
         C = 10
 
         dist_reward = A - ((((rel_desired_heading_vec[0]-0.40)**2 + (rel_desired_heading_vec[1]) **2)**(0.5)) / B   +  C * angle_diff_2)
-
-        # print(angle_diff_2 * 180 / np.pi)
 
         # Collision reward
         col_reward = 0
@@ -365,10 +377,12 @@ class HexyEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         self.xy_vel.append(xy_2_vel)
 
 
-        ## Plotting Trajectory
-        if self.time_step == 280 - 1 :     # max_episode_steps - 1
-            plt.plot(self.xlist_2[2:], self.ylist_2[2:], 'r-', label='reference_agent')
-            plt.plot(self.xlist_1[2:], self.ylist_1[2:], 'b-', label='following_agent')
+        # ## Plotting Trajectory
+        if self.time_step == 1240 - 1 :     # max_episode_steps - 1
+            plt.plot(self.xlist_2[2:], self.ylist_2[2:], 'r-', label='Target_agent')
+            plt.plot(self.xlist_1[2:], self.ylist_1[2:], 'b-', label='Follower_agent')
+
+
             #plt.plot(self.xy_vel)
             plt.legend()
             plt.show()
