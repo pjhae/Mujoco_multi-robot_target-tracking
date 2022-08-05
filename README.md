@@ -18,20 +18,21 @@
   4. Train/Test
 
     cd YOUR_PATH/python3.X/site-packages/gym/train_test_
-    (Training v4,v7) python PPO_train.py
-    (Training v5,v6) python PPO_train_custum-v2.py
+    (Training v9) python PPO_train.py
+    (Training v8) python PPO_train_custum-v2.py
     (Test) python PPO_check.py
     
     
 ##
 ### 1. Problem Statement
 
-Our main goal is to verify that robot control can be implemented in a simulated environment using vision-based RL algorithms.
+Our main Our fundamental goal is to control the robot in simulation using a vision-based RL algorithm.
 
-For this purpose, two tasks are set up.
+TASK : Target tracking Locomotion
+
+![image](https://user-images.githubusercontent.com/74540268/183004358-ea2d3f36-fce0-4717-adcd-ef64bc1f3c92.png)
 
 
-![image](https://user-images.githubusercontent.com/74540268/179348883-e2e23c23-31f5-40ec-bd59-769db91b549f.png)
 
 ##
 ### 2. Hardware 3D design
@@ -42,11 +43,13 @@ URDF, xml : All links and joints are manually reverse engineered using assembly 
 
 ##
 ### 3. MUJOCO camera sensor
-![image](https://user-images.githubusercontent.com/74540268/179350874-c0dfab51-01d5-4d2c-8a16-8684bcc4f9b1.png)
+
+![image](https://user-images.githubusercontent.com/74540268/183004430-8e820044-b7ad-48bb-8a43-1c519efd3879.png)
+
 
 For mounting Camera on Robot Model, you can see the file in gym/mujoco/assets/Hexy_ver_2.3/assets
 
-To get RGB data from camera for observation, you can see the file in gym/mujoco/hexy_v5,6.py
+To get RGB data from camera for observation, you can see the file in gym/mujoco/hexy_v8.py
 
 
 ##
@@ -70,17 +73,20 @@ you can see the code for specific MDP setting(S,A,R..) info
     YOUR_PATH/python3.X/site-packages/gym/envs/mujoco/
 
 
-**hexy_v4.py** : Just walking(Rotation, going forward) without vision infomation (using only current qpos as observation)
+**hexy_v8.py** : *TASK*
 
-**hexy_v5.py** : *Task 1*
+**hexy_v9.py** : *Simplified vector verification*
 
-**hexy_v6.py** : *Task 2*
-
-**hexy_v7.py** : One-hot vector verification for *Task 2*
 
  
 ##
 ### 6. Results
+
+**Simplified vector obs verification : ** 
+![image](https://user-images.githubusercontent.com/74540268/183004580-cc32688b-8a1c-4dca-adc0-e95dfffaec85.png)
+
+**Camera obs + CNN verification : ** 
+![image](https://user-images.githubusercontent.com/74540268/183004664-03896098-c707-4258-b5c3-d086483bebf1.png)
 
 
 **Video : [YOUTUBE link](https://youtu.be/kn1GcEtVa3g)**
