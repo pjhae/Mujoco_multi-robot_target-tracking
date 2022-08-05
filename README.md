@@ -80,18 +80,15 @@ you can see the code for specific MDP setting(S,A,R..) info
 
  
 ##
-### 6. Results
-
-  **6-1. Simplified vector obs verification**
+### 6. Results - Simplified vector obs verification
 
 
 ![image](https://user-images.githubusercontent.com/74540268/183004580-cc32688b-8a1c-4dca-adc0-e95dfffaec85.png)
 
 
-
-
-  **6-2. Camera obs + CNN verification**
-
+##
+### 6. Results - Camera obs + CNN verification
+  
 
 ![image](https://user-images.githubusercontent.com/74540268/183004664-03896098-c707-4258-b5c3-d086483bebf1.png)
 
