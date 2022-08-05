@@ -89,7 +89,7 @@ you can see the code for specific MDP setting(S,A,R..) info
 
 
 ##
-### 7. Results - Camera obs + CNN verification
+### 7. Results - Camera obs + CNN feature extraction
   
 
 ![image](https://user-images.githubusercontent.com/74540268/183004664-03896098-c707-4258-b5c3-d086483bebf1.png)
