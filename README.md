@@ -1,4 +1,4 @@
-## Vision-based End-to-End_target-tracking
+## Vision-based End-to-End target-tracking
 
 ### 0. Requirements
  Installation : GYM, MUJOCO, Stable-Baselines3 + (Linux)
